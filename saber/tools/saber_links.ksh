@@ -11,8 +11,18 @@ modeldata=$1
 testdata=$2
 test=$3
 
+# Grid file
+grid=${testdata}/grid.nc
+
 # Make directory
 mkdir -p ${testdata}
+
+# Remove existing ensemble members, wind and grid
+rm -f ${testdata}/ens1_*
+rm -f ${testdata}/ens2_*
+rm -f ${testdata}/wind_*
+rm -f ${grid}
+
 # Link members
 i=0
 ne=1
@@ -129,6 +139,12 @@ while [ ${i} -lt ${ne} ] ; do
       done
    fi
 
+   # NorCPM
+   if test ${test} = "bump_norcpm" ; then
+      ne=1 # TODO: update the ensemble size
+      ln -sf ${modeldata}/${test}/N1850AERCN_staticEnsemble.micom.r.0001-01-15-00000.nc ${testdata}/ens1_00_${i4}.nc # TODO: update the members path
+   fi
+
    # RES
    if test ${test} = "bump_res" ; then
       ne=101
@@ -169,7 +185,6 @@ echo "Link grid"
 
 # AROME
 if test ${test} = "bump_aro" ; then
-   grid=${testdata}/grid.nc
    saved_grid=${modeldata}/${test}/${xp}/grid.nc
    if test -e ${saved_grid} ; then
       # Copy grid.nc from data
@@ -177,8 +192,6 @@ if test ${test} = "bump_aro" ; then
    else
       # Generate grid.nc with EPyGrAM
       origin=${modeldata}/${test}/${xp}/${date}/member_001/forecast/ICMSHAROM+0003
-      grid=${testdata}/grid.nc
-      rm -f ${grid}
       cat<<EOFNAM >epygram_request.py
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -216,7 +229,6 @@ fi
 
 # ARPEGE
 if test ${test} = "bump_arp" ; then
-   grid=${testdata}/grid.nc
    saved_grid=${modeldata}/${test}/${xp}/grid.nc
    if test -e ${saved_grid} ; then
       # Copy grid.nc from data
@@ -224,7 +236,6 @@ if test ${test} = "bump_arp" ; then
    else
       # Generate grid.nc with EPyGrAM
       origin=${modeldata}/${test}/${xp}/${date}/ensemble4D/001/ICMSHARPE+0000
-      rm -f ${grid}
       cat<<EOFNAM >epygram_request.py
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -251,8 +262,6 @@ if test ${test} = "bump_fv3" ; then
    # Copy grid.nc
    origin_h=${modeldata}/${test}/${date}_${hh}/fv3files/fv3grid_${resol}.nc4
    origin_v=${modeldata}/${test}/${date}_${hh}/fv3files/akbk64.nc4
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v flons,flats ${origin_h} ${grid}
    ncks -A -v ak,bk ${origin_v} ${grid}
 fi
@@ -261,8 +270,6 @@ fi
 if test ${test} = "bump_gem" ; then
    # Generate grid with ncks
    origin=${testdata}/ens1_00_0001.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v lat,lon,lev,ap,b ${origin} ${grid}
 fi
 
@@ -270,8 +277,6 @@ fi
 if test ${test} = "bump_geos" ; then
    # Generate grid with ncks and ncwa
    origin=${testdata}/wind_00.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v lons,lats,lev,delp ${origin} ${grid}
 fi
 
@@ -279,8 +284,6 @@ fi
 if test ${test} = "bump_gfs" ; then
    # Generate grid with ncks
    origin=${testdata}/ens1_00_0001.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v latitude,longitude,level,ak,bk ${origin} ${grid}
 fi
 
@@ -288,8 +291,6 @@ fi
 if test ${test} = "bump_ifs" ; then
    # Generate grid.nc with ncks
    origin=${testdata}/ens1_01_0001.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v latitude,longitude,level ${origin} ${grid}
 
    # Add pressure profile to grid.nc with ncl
@@ -333,41 +334,39 @@ fi
 # MPAS
 if test ${test} = "bump_mpas" ; then
    origin=${modeldata}/${test}/x1.40962.init.2018-04-15_00.00.00.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v latCell,lonCell ${origin} ${grid}
    ncwa -O -v pressure_base -a Time,nCells ${origin} pressure.nc
    ncks -A -v pressure_base pressure.nc ${grid}
    rm -f pressure.nc
 fi
 
+# NorCPM
+if test ${test} = "bump_norcpm" ; then
+   origin1=${modeldata}/${test}/grid.nc # TODO: update path
+   origin2=${modeldata}/${test}/N1850AERCN_staticEnsemble.micom.r.0001-01-15-00000.nc # TODO: update path
+   ncks -O -v plon,plat,parea,pmask ${origin1} ${grid}
+   ncks -A -v dp ${origin2} ${grid}
+fi
+
 # NEMO
 if test ${test} = "bump_nemovar" ; then
    origin=${modeldata}/${test}/mesh_mask
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v nav_lat,nav_lon,tmask,e1t,e2t,e3t ${origin} ${grid}
 fi
 if test ${test} = "bump_cera-20c" ; then
    origin=${modeldata}/${test}/mesh_mask
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v nav_lat,nav_lon,tmask,e1t,e2t,e3t ${origin} ${grid}
 fi
 
 # RES
 if test ${test} = "bump_res" ; then
    origin=${modeldata}/${test}/MyGrid.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    cp -f ${origin} ${grid}
 fi
 
 # WRF
 if test ${test} = "bump_wrf" ; then
    origin=${testdata}/ens1_01_0001.nc
-   grid=${testdata}/grid.nc
-   rm -f ${grid}
    ncks -O -v XLONG,XLAT ${origin} ${grid}
    ncwa -O -v PB -a Time,south_north,west_east ${origin} pressure.nc
    ncks -A -v PB pressure.nc ${grid}

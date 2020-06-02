@@ -10,3 +10,12 @@ Please notice:
  - The test **saber_coding_norms** is failing in this temporary setting.
  - The BUMP executable is located in the `${BUILD_DIR}/bin/bump.x`
  - The usual command to run this executable is: `mpiexec -n ${NPROC} ${BUILD_DIR}/bin/bump.x ${INPUT_YAML_FILE} ${OUTPUT_LOG_DIRECTORY}` where `${NPROC}` is the number of MPI tasks.
+
+The environment variables to set are:
+ - `SABER_TEST_TIER` (1 to 3, default 1)
+ - `SABER_TEST_MPI` (0 or 1, default 1)
+ - `SABER_TEST_OMP` (0 or 1, default 0)
+ - `SABER_TEST_QUAD` (0 or 1, default 0)
+ - `SABER_TEST_VALGRIND` (0 or 1, default 0)
+ - `SABER_TEST_MODEL` (0 or 1, default 0)
+ - `SABER_TEST_MODEL_DIR` (data directory, default "")
