@@ -10,6 +10,7 @@ build="${HOME}/build"
 branch="feature/norcpm_interface"
 
 # Environment variables
+compiler=GNU
 export OMP_NUM_THREADS=1
 export SABER_TEST_TIER=1
 export SABER_TEST_MPI=1
@@ -21,8 +22,7 @@ export SABER_TEST_MODEL_DIR=${HOME}/data
 
 ############################################################
 
-# Environment variables
-compiler=GNU
+# Get compiler-related variables
 export MPIEXEC=`which mpirun`
 if test "${compiler}" = "GNU" ; then
    export CPCcomp=`which mpicxx`
