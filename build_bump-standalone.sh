@@ -1,8 +1,25 @@
 #!/bin/bash
 
+# Parameters ###############################################
+
 # Directories
-code=${HOME}/code/bump-standalone
-build=${HOME}/build/bump-standalone
+code="${HOME}/code"
+build="${HOME}/build"
+
+# Git branch
+branch="feature/norcpm_interface"
+
+# Environment variables
+export OMP_NUM_THREADS=1
+export SABER_TEST_TIER=1
+export SABER_TEST_MPI=1
+export SABER_TEST_OMP=0
+export SABER_TEST_QUAD=0
+export SABER_TEST_VALGRIND=0
+export SABER_TEST_MODEL=1
+export SABER_TEST_MODEL_DIR=${HOME}/data
+
+############################################################
 
 # Environment variables
 compiler=GNU
@@ -18,22 +35,13 @@ if test "${compiler}" = "Intel" ; then
    export F90comp=`which mpiifort`
 fi
 
-# Clone repo
-git clone https://github.com/benjaminmenetrier/bump-standalone.git ${code}
-
 # Build
-mkdir -p ${build}
-cd ${build}
+mkdir -p ${build}/bump-standalone
+cd ${build}/bump-standalone
 ecbuild --build=release \
         -DCMAKE_CXX_COMPILER=${CPCcomp} \
         -DCMAKE_C_COMPILER=${CCcomp} \
         -DCMAKE_Fortran_COMPILER=${F90comp} \
         -DNETCDF_PATH=${NETCDF} \
         -DMPIEXEC=${MPIEXEC} \
-        ${code}
-
-# Compile (change 4 for the required number of threads)
-make -j4
-
-# Test (change 4 for the required number of threads)
-ctest -j4
+        ${code}/bump-standalone

@@ -142,7 +142,7 @@ while [ ${i} -lt ${ne} ] ; do
    # NorCPM
    if test ${test} = "bump_norcpm" ; then
       ne=1 # TODO: update the ensemble size
-      ln -sf ${modeldata}/${test}/N1850AERCN_staticEnsemble.micom.r.0001-01-15-00000.nc ${testdata}/ens1_00_${i4}.nc # TODO: update the members path
+      ln -sf ${modeldata}/${test}/N1850AERCN_staticEnsemble.micom.r.0001-01-15-00000.nc ${testdata}/ens1_00_${i4}.nc # TODO: update the members path, with the correct member index
    fi
 
    # RES
