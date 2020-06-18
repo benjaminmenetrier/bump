@@ -10,7 +10,7 @@ build="${HOME}/build"
 branch="feature/norcpm_interface"
 
 # Environment variables
-compiler=GNU
+export compiler=GNU
 export OMP_NUM_THREADS=1
 export SABER_TEST_TIER=1
 export SABER_TEST_MPI=1
