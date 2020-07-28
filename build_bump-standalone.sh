@@ -9,6 +9,9 @@ build="${HOME}/build"
 # Git branch
 branch="feature/norcpm_interface"
 
+# Mode (debug/release)
+mode=debug
+
 # Environment variables
 export compiler=GNU
 export OMP_NUM_THREADS=1
@@ -36,9 +39,17 @@ if test "${compiler}" = "Intel" ; then
 fi
 
 # Build
-mkdir -p ${build}/bump-standalone
-cd ${build}/bump-standalone
-ecbuild --build=release \
+if test "${mode}" = "release"; then
+   mkdir -p ${build}/bump-standalone
+   cd ${build}/bump-standalone
+elif test "${mode}" = "debug"; then
+   mkdir -p ${build}/bump-standalone_debug
+   cd ${build}/bump-standalone_debug
+else
+   echo -e "Wrong mode (debug or release"
+   exit 1
+fi
+ecbuild --build=${mode} \
         -DCMAKE_CXX_COMPILER=${CPCcomp} \
         -DCMAKE_C_COMPILER=${CCcomp} \
         -DCMAKE_Fortran_COMPILER=${F90comp} \
